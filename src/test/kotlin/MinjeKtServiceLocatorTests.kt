@@ -4,6 +4,7 @@ import com.minjeKt.locator.MinjeKtServiceLocator
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 
 class DummyTestClass {
 
@@ -83,4 +84,20 @@ class MinjeKtServiceLocatorTests {
         assertThrows<CircularDependencyException> { locator.locate<CircularDepB>() }
         assertThrows<CircularDependencyException> { locator.locate<CircularDepC>() }
     }
+
+    @Test
+    fun whenASingletonDependencyIsLocatedMultipleTimes_ItIsAlwaysTheSameObject(){
+        val locator = MinjeKtServiceLocator()
+            .registerLazySingleton<DummyInterface, DummyImpl>()
+
+        val obj1 = locator.locate<DummyInterface>()
+        val obj2 = locator.locate<DummyInterface>()
+        val obj3 = locator.locate<DummyInterface>()
+        val obj4 = locator.locate<DummyInterface>()
+
+        assertSame(obj1, obj2)
+        assertSame(obj2, obj3)
+        assertSame(obj3, obj4)
+    }
+
 }
