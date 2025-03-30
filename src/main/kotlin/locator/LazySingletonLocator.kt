@@ -4,12 +4,13 @@ import com.minjeKt.exception.CircularDependencyException
 import com.minjeKt.exception.ConstructorIsNotAccessibleException
 import com.minjeKt.exception.DependencyNotRegisteredException
 import com.minjeKt.exception.PrimaryConstructorNotFoundException
+import locator.ParameterInitializer
 import java.util.HashSet
 import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.primaryConstructor
 
-class LazySingletonLocator : Locator {
+class LazySingletonLocator(val parameterInitializer: ParameterInitializer) : Locator {
     val singletonInstances: HashMap<KClass<*>, Any> = HashMap()
     val singletonClasses: HashMap<KClass<*>, KClass<*>> = HashMap()
     val visited: HashSet<KClass<*>> = HashSet()
@@ -57,15 +58,9 @@ class LazySingletonLocator : Locator {
             throw ConstructorIsNotAccessibleException("Primary constructor for type $clazz is not public")
         }
 
-        val parameters = constructor.parameters
+        val parameters = parameterInitializer.initialize(constructor.parameters)
 
-        val parameterInstances: Array<Any> = parameters.map { p ->
-            val parameterClazz = p.type.classifier as KClass<*>
-
-            init(parameterClazz)
-        }.toTypedArray()
-
-        val instance = constructor.call(*parameterInstances)
+        val instance = constructor.call(*parameters)
 
         singletonInstances[clazz] = instance
 
