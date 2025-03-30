@@ -1,5 +1,7 @@
 import com.minjeKt.exception.CircularDependencyException
+import com.minjeKt.exception.ConstructorIsNotAccessibleException
 import com.minjeKt.exception.DependencyNotRegisteredException
+import com.minjeKt.exception.PrimaryConstructorNotFoundException
 import com.minjeKt.locator.MinjeKtServiceLocatorBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -35,6 +37,8 @@ class SingletonDep2(val x: TransientDep2)
 class EagerSingletonDep(val x: LazySingletonDep)
 class LazySingletonDep(val x: TransientDepX)
 class TransientDepX(val x: EagerSingletonDep)
+
+class ClassWithPrivateConstructor private constructor() {}
 
 class MinjeKtServiceLocatorBuilderTests {
     @Test
@@ -263,5 +267,25 @@ class MinjeKtServiceLocatorBuilderTests {
         val located = locator.locate<DummyInterface>()
 
         assertSame(impl, located)
+    }
+
+    @Test
+    fun whenATypeWithNoPrimaryConstructorIsRegistered_AnExceptionIsThrown(){
+        val builder = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerSingleton<DummyInterface, DummyInterface>()
+
+        assertThrows<PrimaryConstructorNotFoundException>{
+            builder.build()
+        }
+    }
+
+    @Test
+    fun whenAClassWithAPrivateConstructorIsRegistered_AnExceptionIsThrown(){
+        val builder = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerSingleton<ClassWithPrivateConstructor, ClassWithPrivateConstructor>()
+
+        assertThrows<ConstructorIsNotAccessibleException> {
+            builder.build()
+        }
     }
 }
