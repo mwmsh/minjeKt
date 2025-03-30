@@ -1,10 +1,10 @@
 package com.minjeKt.locator
 
-import locator.ParameterInitializer
+import com.minjeKt.exception.DependencyNotRegisteredException
+import locator.ObjectConstructor
 import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
 
-class TransientLocator(val paramInitializer: ParameterInitializer): Locator {
+class TransientLocator(val objectConstructor: ObjectConstructor): Locator {
     private val serviceClasses: HashMap<KClass<*>, KClass<*>> = HashMap()
 
     override fun register(service: KClass<*>, impl: KClass<*>) {
@@ -18,19 +18,12 @@ class TransientLocator(val paramInitializer: ParameterInitializer): Locator {
 
     override fun locate(service: KClass<*>): Any {
         val impl = serviceClasses[service]
+
         if (impl == null) {
-            throw IllegalArgumentException("Service not registered $service")
+            throw DependencyNotRegisteredException("Service not registered $service")
         }
 
-        val constructor = impl.primaryConstructor
-
-        if (constructor == null) {
-            throw IllegalArgumentException("No primary constructor found for type $impl")
-        }
-
-        val params = paramInitializer.initialize(constructor.parameters)
-
-        return constructor.call(*params)
+        return objectConstructor.construct(impl)
     }
 
 }

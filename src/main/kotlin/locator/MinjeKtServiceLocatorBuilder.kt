@@ -30,6 +30,16 @@ class MinjeKtServiceLocatorBuilder(val store: ServiceStore) {
         return this
     }
 
+    inline fun <reified TService, reified TImpl : TService> registerSingleton(): MinjeKtServiceLocatorBuilder {
+        store.register(TService::class, TImpl::class, LocatorType.SINGLETON)
+        return this
+    }
+
+    inline fun <reified TService> registerSingleton(value: TService): MinjeKtServiceLocatorBuilder {
+        store.register<TService>(value, LocatorType.SINGLETON)
+        return this
+    }
+
     inline fun <reified TService, reified TImpl : TService> registerTransient(): MinjeKtServiceLocatorBuilder {
         store.register<TService, TImpl>(LocatorType.TRANSIENT)
         return this
@@ -37,6 +47,11 @@ class MinjeKtServiceLocatorBuilder(val store: ServiceStore) {
 
     fun build(): MinjeKtServiceLocator {
         CycleDetector.ensureSaneDependencyGraph(store)
+
+        store.getAllEagerLocators().forEach {
+            it.initialize()
+        }
+
         return MinjeKtServiceLocator(store)
     }
 }

@@ -7,3 +7,7 @@ interface Locator {
     fun register(service: KClass<*>, obj: Any)
     fun locate(service: KClass<*>): Any
 }
+
+interface EagerLocator: Locator {
+    fun initialize()
+}

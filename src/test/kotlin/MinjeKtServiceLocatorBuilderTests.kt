@@ -26,11 +26,15 @@ class CircularDepA(x: CircularDepB)
 class CircularDepB(x: CircularDepC)
 class CircularDepC(x: CircularDepA)
 
-class SingletonDep(){}
-class TransientDep(val x: SingletonDep){}
+class SingletonDep() {}
+class TransientDep(val x: SingletonDep) {}
 
 class TransientDep2()
 class SingletonDep2(val x: TransientDep2)
+
+class EagerSingletonDep(val x: LazySingletonDep)
+class LazySingletonDep(val x: TransientDepX)
+class TransientDepX(val x: EagerSingletonDep)
 
 class MinjeKtServiceLocatorBuilderTests {
     @Test
@@ -82,7 +86,7 @@ class MinjeKtServiceLocatorBuilderTests {
     }
 
     @Test
-    fun whenThreeClassCircularDependencyIsEncountered_AnExceptionIsThrown(){
+    fun whenThreeClassCircularDependencyIsEncountered_AnExceptionIsThrown() {
         val builder = MinjeKtServiceLocatorBuilder(ServiceStore())
             .registerLazySingleton<CircularDepA, CircularDepA>()
             .registerLazySingleton<CircularDepB, CircularDepB>()
@@ -94,7 +98,7 @@ class MinjeKtServiceLocatorBuilderTests {
     }
 
     @Test
-    fun whenASingletonDependencyIsLocatedMultipleTimes_ItIsAlwaysTheSameObject(){
+    fun whenASingletonDependencyIsLocatedMultipleTimes_ItIsAlwaysTheSameObject() {
         val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
             .registerLazySingleton<DummyInterface, DummyImpl>()
             .build()
@@ -152,7 +156,7 @@ class MinjeKtServiceLocatorBuilderTests {
     }
 
     @Test
-    fun whenATransientDependencyIsLocatedMultipleTimes_ItIsAlwaysADifferentObject(){
+    fun whenATransientDependencyIsLocatedMultipleTimes_ItIsAlwaysADifferentObject() {
         val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
             .registerTransient<DummyInterface, DummyImpl>()
             .build()
@@ -168,7 +172,7 @@ class MinjeKtServiceLocatorBuilderTests {
     }
 
     @Test
-    fun whenATransientClassReferencesASingletonClass_NoErrorsOccur(){
+    fun whenATransientClassReferencesASingletonClass_NoErrorsOccur() {
         val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
             .registerLazySingleton<SingletonDep, SingletonDep>()
             .registerTransient<TransientDep, TransientDep>()
@@ -188,7 +192,7 @@ class MinjeKtServiceLocatorBuilderTests {
     }
 
     @Test
-    fun whenASingletonClassReferencesATriansientClass_NoErrorsOccur(){
+    fun whenASingletonClassReferencesATransientClass_NoErrorsOccur() {
         val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
             .registerTransient<TransientDep2, TransientDep2>()
             .registerLazySingleton<SingletonDep2, SingletonDep2>()
@@ -210,5 +214,54 @@ class MinjeKtServiceLocatorBuilderTests {
         assertEquals("TransientDep2", transient2::class.simpleName)
         assertEquals("TransientDep2", singleton.x::class.simpleName)
         assertEquals("TransientDep2", singleton2.x::class.simpleName)
+    }
+
+    @Test
+    fun whenAnEagerSingletonServiceIsRegistered_ItIsLocatedSuccessfully() {
+        val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerSingleton<DummyInterface, DummyImpl>()
+            .build()
+
+        val singleton1: DummyInterface = locator.locate<DummyInterface>()
+        val singleton2: DummyInterface = locator.locate<DummyInterface>()
+
+        assertSame(singleton1, singleton2)
+        assertEquals("DummyImpl", singleton1::class.simpleName)
+    }
+
+    @Test
+    fun whenADependencyCycleContainingEagerSingletonLazySingletonTransientOccurs_ItThrowsAnError() {
+        val builder = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerTransient<TransientDepX, TransientDepX>()
+            .registerLazySingleton<LazySingletonDep, LazySingletonDep>()
+            .registerSingleton<EagerSingletonDep, EagerSingletonDep>()
+
+        assertThrows<CircularDependencyException> {
+            builder.build()
+        }
+    }
+
+    @Test
+    fun whenAnEagerSingletonInstanceIsRegistered_ItIsLocatedSuccessfully() {
+        val impl = DummyImpl()
+        val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerSingleton<DummyInterface>(impl)
+            .build()
+
+        val located = locator.locate<DummyInterface>()
+
+        assertSame(impl, located)
+    }
+
+    @Test
+    fun whenALazySingletonInstanceIsRegistered_ItIsLocatedSuccessfully() {
+        val impl = DummyImpl()
+        val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerLazySingleton<DummyInterface>(impl)
+            .build()
+
+        val located = locator.locate<DummyInterface>()
+
+        assertSame(impl, located)
     }
 }

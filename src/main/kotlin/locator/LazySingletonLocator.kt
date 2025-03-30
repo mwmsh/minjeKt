@@ -1,19 +1,11 @@
 package com.minjeKt.locator
 
-import com.minjeKt.exception.CircularDependencyException
-import com.minjeKt.exception.ConstructorIsNotAccessibleException
-import com.minjeKt.exception.DependencyNotRegisteredException
-import com.minjeKt.exception.PrimaryConstructorNotFoundException
-import locator.ParameterInitializer
-import java.util.HashSet
+import locator.ObjectConstructor
 import kotlin.reflect.KClass
-import kotlin.reflect.KVisibility
-import kotlin.reflect.full.primaryConstructor
 
-class LazySingletonLocator(val parameterInitializer: ParameterInitializer) : Locator {
+class LazySingletonLocator(val objectConstructor: ObjectConstructor) : Locator {
     val singletonInstances: HashMap<KClass<*>, Any> = HashMap()
     val singletonClasses: HashMap<KClass<*>, KClass<*>> = HashMap()
-    val visited: HashSet<KClass<*>> = HashSet()
 
     override fun register(service: KClass<*>, impl: KClass<*>) {
         singletonClasses[service] = impl
@@ -31,39 +23,10 @@ class LazySingletonLocator(val parameterInitializer: ParameterInitializer) : Loc
         return singletonInstances[service]!!
     }
 
-    fun init(clazz: KClass<*>): Any {
-        if (singletonInstances.containsKey(clazz)) {
-            return singletonInstances[clazz]!!
-        }
-
-        if (!singletonClasses.containsKey(clazz)) {
-            throw DependencyNotRegisteredException("Type ${clazz.qualifiedName} is not registered. You can register classes using ServiceLocator (e.g., ServiceLocator.registerSingleton<${clazz.simpleName}, ${clazz.simpleName}Impl>() }")
-        }
-
-        if (visited.contains(clazz)) {
-            throw CircularDependencyException("Could not initialize $clazz. This is likely due to a circular dependency")
-        }
-
-        visited.add(clazz)
-
-        val implClass = singletonClasses[clazz]!!
-
-        val constructor = implClass.primaryConstructor
-
-        if (constructor == null) {
-            throw PrimaryConstructorNotFoundException("Could not locate primary constructor for type $implClass")
-        }
-
-        if (constructor.visibility != KVisibility.PUBLIC) {
-            throw ConstructorIsNotAccessibleException("Primary constructor for type $clazz is not public")
-        }
-
-        val parameters = parameterInitializer.initialize(constructor.parameters)
-
-        val instance = constructor.call(*parameters)
-
-        singletonInstances[clazz] = instance
-
+    private fun init(service: KClass<*>): Any {
+        val implClass = singletonClasses[service]!!
+        val instance = objectConstructor.construct(implClass)
+        singletonInstances[service] = instance
         return instance
     }
 }

@@ -1,12 +1,10 @@
 package store
 
 import com.minjeKt.exception.DependencyNotRegisteredException
+import com.minjeKt.locator.EagerLocator
 import com.minjeKt.locator.LazySingletonLocator
 import com.minjeKt.locator.TransientLocator
-import locator.ParameterInitializer
-import locator.LocatorFactory
-import locator.ClassLocatorTypeRegistry
-import locator.LocatorType
+import locator.*
 import kotlin.reflect.KClass
 
 class ServiceStore() {
@@ -16,9 +14,12 @@ class ServiceStore() {
     private var registeredClasses: HashMap<KClass<*>, KClass<*>> = HashMap()
 
     fun init(): ServiceStore {
-        val parameterInitializer = ParameterInitializer(this)
+        val parameterInitializer = ObjectConstructor(this)
+        val lazySingletonLocator = LazySingletonLocator(parameterInitializer)
+        val transientLocator = TransientLocator(parameterInitializer)
+        val singletonLocator = SingletonLocator(parameterInitializer)
         this.locatorFactory =
-            LocatorFactory(LazySingletonLocator(parameterInitializer), TransientLocator(parameterInitializer))
+            LocatorFactory(lazySingletonLocator, transientLocator, singletonLocator)
         this.serviceLocatorRegistry = ClassLocatorTypeRegistry()
         return this
     }
@@ -85,5 +86,11 @@ class ServiceStore() {
 
     internal fun getAllServices(): List<KClass<*>> {
         return registeredClasses.keys.toList()
+    }
+
+    internal fun getAllEagerLocators(): List<EagerLocator> {
+        ensureInitialized()
+
+        return locatorFactory!!.getByType<EagerLocator>()
     }
 }
