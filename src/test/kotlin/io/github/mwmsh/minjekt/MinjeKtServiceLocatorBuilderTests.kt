@@ -6,6 +6,7 @@ import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
 import io.github.mwmsh.minjekt.exception.PrimaryConstructorNotFoundException
 import io.github.mwmsh.minjekt.store.ServiceStore
 import org.junit.jupiter.api.assertThrows
+import org.minjekt.locator.MinjeKtServiceLocator
 import org.minjekt.locator.MinjeKtServiceLocatorBuilder
 import kotlin.test.Test
 import kotlin.test.assertNotSame
@@ -273,22 +274,57 @@ class MinjeKtServiceLocatorBuilderTests {
     }
 
     @Test
-    fun whenATypeWithNoPrimaryConstructorIsRegistered_AnExceptionIsThrown(){
+    fun whenATypeWithNoPrimaryConstructorIsRegistered_AnExceptionIsThrown() {
         val builder = MinjeKtServiceLocatorBuilder(ServiceStore())
             .registerSingleton<DummyInterface, DummyInterface>()
 
-        assertThrows<PrimaryConstructorNotFoundException>{
+        assertThrows<PrimaryConstructorNotFoundException> {
             builder.build()
         }
     }
 
     @Test
-    fun whenAClassWithAPrivateConstructorIsRegistered_AnExceptionIsThrown(){
+    fun whenAClassWithAPrivateConstructorIsRegistered_AnExceptionIsThrown() {
         val builder = MinjeKtServiceLocatorBuilder(ServiceStore())
             .registerSingleton<ClassWithPrivateConstructor, ClassWithPrivateConstructor>()
 
         assertThrows<ConstructorIsNotAccessibleException> {
             builder.build()
         }
+    }
+
+    @Test
+    fun whenAClassWithADefaultParameterIsRegistered_DefaultParametersAreRespected() {
+        class DefClass(val param: List<String> = listOf("hello"))
+
+        val locator = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerSingleton<DefClass, DefClass>()
+            .build()
+
+        val result: DefClass = locator.locate<DefClass>()
+
+        assertEquals(result.param, listOf("hello"))
+    }
+
+    @Test
+    fun whenAClassWithDefaultAndNonDefaultParametersIsRegistered_DefaultParametersAreRespected() {
+        class TestClass1(val param: Set<String> = setOf("test class1")) {}
+        class TestClass2 {}
+
+        class DefClass(
+            val class1: TestClass1,
+            val param: List<String> = listOf("hello", "world"),
+            val class2: TestClass2
+        )
+
+        val locator: MinjeKtServiceLocator = MinjeKtServiceLocatorBuilder(ServiceStore())
+            .registerLazySingleton<TestClass1, TestClass1>()
+            .registerLazySingleton<TestClass2, TestClass2>()
+            .registerLazySingleton<DefClass, DefClass>()
+            .build()
+
+        val obj = locator.locate<DefClass>()
+        assertEquals(obj.param, listOf("hello", "world"))
+        assertEquals(obj.class1.param, setOf("test class1"))
     }
 }

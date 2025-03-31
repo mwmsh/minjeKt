@@ -42,7 +42,7 @@ class CycleDetector {
                 val implClass = store.findServiceImpl(curr)
 
                 if (implClass == null) {
-                    throw DependencyNotRegisteredException("No registered service for ${curr::class.qualifiedName}")
+                    throw DependencyNotRegisteredException("No registered service for ${curr.qualifiedName}")
                 }
 
                 val primaryConstructor = implClass.primaryConstructor
@@ -51,7 +51,9 @@ class CycleDetector {
                     throw PrimaryConstructorNotFoundException("Could not locate primary constructor for type $implClass")
                 }
 
-                val children = primaryConstructor.parameters.map { it.type.classifier as KClass<*> }
+                val children = primaryConstructor.parameters
+                    .filter{!it.isOptional}
+                    .map { it.type.classifier as KClass<*> }
 
                 stack.addAll(children)
             }

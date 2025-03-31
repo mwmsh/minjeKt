@@ -3,6 +3,7 @@ package io.github.mwmsh.minjekt.locator
 import io.github.mwmsh.minjekt.store.ServiceStore
 import io.github.mwmsh.minjekt.exception.ConstructorIsNotAccessibleException
 import io.github.mwmsh.minjekt.exception.PrimaryConstructorNotFoundException
+import java.util.stream.Collectors
 import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.primaryConstructor
@@ -19,8 +20,10 @@ class ObjectConstructor(val store: ServiceStore) {
             throw ConstructorIsNotAccessibleException("Primary constructor for type $clazz is not public")
         }
 
-        val params = constructor.parameters.map { store.locate(it.type.classifier as KClass<*>) }.toTypedArray()
+        val args = constructor.parameters.stream()
+            .filter { !it.isOptional }
+            .collect(Collectors.toMap({ it }, { store.locate(it.type.classifier as KClass<*>) }))
 
-        return constructor.call(*params)
+        return constructor.callBy(args)
     }
 }
