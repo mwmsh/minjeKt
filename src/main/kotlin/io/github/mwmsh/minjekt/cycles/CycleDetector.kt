@@ -1,10 +1,10 @@
-package cycles
+package io.github.mwmsh.minjekt.cycles
 
-import com.minjeKt.exception.CircularDependencyException
-import com.minjeKt.exception.DependencyNotRegisteredException
-import com.minjeKt.exception.PrimaryConstructorNotFoundException
-import store.ServiceStore
-import java.util.Stack
+import io.github.mwmsh.minjekt.exception.CircularDependencyException
+import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
+import io.github.mwmsh.minjekt.exception.PrimaryConstructorNotFoundException
+import io.github.mwmsh.minjekt.store.ServiceStore
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
@@ -22,7 +22,7 @@ class CycleDetector {
 
         //O(n^2), can be linearized with caching
         fun ensureSaneDependencyGraph(store: ServiceStore) {
-            store.getAllServices().forEach { service -> ensureSaneDependencyGraph(service, store)}
+            store.getAllServices().forEach { service -> ensureSaneDependencyGraph(service, store) }
         }
 
         private fun ensureSaneDependencyGraph(service: KClass<*>, store: ServiceStore) {

@@ -1,10 +1,8 @@
-package store
+package io.github.mwmsh.minjekt.store
 
-import com.minjeKt.exception.DependencyNotRegisteredException
-import com.minjeKt.locator.EagerLocator
-import com.minjeKt.locator.LazySingletonLocator
-import com.minjeKt.locator.TransientLocator
-import locator.*
+import io.github.mwmsh.minjekt.locator.*
+import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
+import java.util.*
 import kotlin.reflect.KClass
 
 class ServiceStore() {

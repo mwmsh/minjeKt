@@ -1,14 +1,13 @@
-package com.minjeKt.locator
+package org.minjekt.locator
 
-import cycles.CycleDetector
-import locator.LocatorType
-import store.ServiceStore
+import io.github.mwmsh.minjekt.locator.LocatorType
+import io.github.mwmsh.minjekt.store.ServiceStore
+import io.github.mwmsh.minjekt.cycles.CycleDetector
 
 class MinjeKtServiceLocator(val store: ServiceStore) {
     inline fun <reified TService> locate(): TService {
         return store.locate<TService>()
     }
-
 }
 
 class MinjeKtServiceLocatorBuilder(val store: ServiceStore) {

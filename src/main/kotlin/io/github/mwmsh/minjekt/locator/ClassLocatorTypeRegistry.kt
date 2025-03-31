@@ -1,5 +1,6 @@
-package locator
+package io.github.mwmsh.minjekt.locator
 
+import java.util.*
 import kotlin.reflect.KClass
 
 class ClassLocatorTypeRegistry {

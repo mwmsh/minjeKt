@@ -1,8 +1,8 @@
-package locator
+package io.github.mwmsh.minjekt.locator
 
-import com.minjeKt.exception.ConstructorIsNotAccessibleException
-import com.minjeKt.exception.PrimaryConstructorNotFoundException
-import store.ServiceStore
+import io.github.mwmsh.minjekt.store.ServiceStore
+import io.github.mwmsh.minjekt.exception.ConstructorIsNotAccessibleException
+import io.github.mwmsh.minjekt.exception.PrimaryConstructorNotFoundException
 import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.primaryConstructor

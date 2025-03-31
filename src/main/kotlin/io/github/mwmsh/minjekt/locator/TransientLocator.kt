@@ -1,7 +1,7 @@
-package com.minjeKt.locator
+package io.github.mwmsh.minjekt.locator
 
-import com.minjeKt.exception.DependencyNotRegisteredException
-import locator.ObjectConstructor
+import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
+import java.util.*
 import kotlin.reflect.KClass
 
 class TransientLocator(val objectConstructor: ObjectConstructor): Locator {
@@ -25,5 +25,4 @@ class TransientLocator(val objectConstructor: ObjectConstructor): Locator {
 
         return objectConstructor.construct(impl)
     }
-
 }

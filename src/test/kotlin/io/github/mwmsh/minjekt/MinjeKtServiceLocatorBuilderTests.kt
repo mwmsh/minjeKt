@@ -1,14 +1,17 @@
-import com.minjeKt.exception.CircularDependencyException
-import com.minjeKt.exception.ConstructorIsNotAccessibleException
-import com.minjeKt.exception.DependencyNotRegisteredException
-import com.minjeKt.exception.PrimaryConstructorNotFoundException
-import com.minjeKt.locator.MinjeKtServiceLocatorBuilder
-import org.junit.jupiter.api.Test
+package io.github.mwmsh.minjekt
+
+import io.github.mwmsh.minjekt.exception.CircularDependencyException
+import io.github.mwmsh.minjekt.exception.ConstructorIsNotAccessibleException
+import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
+import io.github.mwmsh.minjekt.exception.PrimaryConstructorNotFoundException
+import io.github.mwmsh.minjekt.store.ServiceStore
 import org.junit.jupiter.api.assertThrows
-import store.ServiceStore
-import kotlin.test.assertEquals
+import org.minjekt.locator.MinjeKtServiceLocatorBuilder
+import kotlin.test.Test
 import kotlin.test.assertNotSame
 import kotlin.test.assertSame
+import kotlin.test.assertEquals
+
 
 class DummyTestClass {
 

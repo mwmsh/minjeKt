@@ -1,7 +1,7 @@
-package locator
+package io.github.mwmsh.minjekt.locator
 
-import com.minjeKt.exception.DependencyNotRegisteredException
-import com.minjeKt.locator.EagerLocator
+import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
+import java.util.*
 import kotlin.reflect.KClass
 
 class SingletonLocator(private val objectConstructor: ObjectConstructor) : EagerLocator {

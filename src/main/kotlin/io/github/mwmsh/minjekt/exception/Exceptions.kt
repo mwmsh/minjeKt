@@ -1,4 +1,4 @@
-package com.minjeKt.exception
+package io.github.mwmsh.minjekt.exception
 
 class CircularDependencyException(message: String) : Exception(message)
 class DependencyNotRegisteredException(message: String) : Exception(message)

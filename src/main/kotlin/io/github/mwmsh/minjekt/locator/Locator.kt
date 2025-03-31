@@ -1,4 +1,4 @@
-package com.minjeKt.locator
+package io.github.mwmsh.minjekt.locator
 
 import kotlin.reflect.KClass
 

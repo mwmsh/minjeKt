@@ -1,6 +1,6 @@
-package com.minjeKt.locator
+package io.github.mwmsh.minjekt.locator
 
-import locator.ObjectConstructor
+import java.util.*
 import kotlin.reflect.KClass
 
 class LazySingletonLocator(val objectConstructor: ObjectConstructor) : Locator {
