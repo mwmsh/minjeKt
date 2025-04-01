@@ -40,6 +40,19 @@ class TransientDepX(val x: EagerSingletonDep)
 
 class ClassWithPrivateConstructor private constructor() {}
 
+
+interface A {}
+
+class AImpl: A {}
+
+interface B{}
+
+class BImpl(val a: A): B{}
+
+interface C{}
+
+class CImpl(a: A, b: B): C {}
+
 class MinjeKtServiceLocatorBuilderTests {
     @Test
     fun whenAnUnregisteredClassIsLocated_AnExceptionIsThrown() {
