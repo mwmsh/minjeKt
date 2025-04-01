@@ -2,7 +2,7 @@ package org.minjekt.locator
 
 import io.github.mwmsh.minjekt.locator.LocatorType
 import io.github.mwmsh.minjekt.store.ServiceStore
-import io.github.mwmsh.minjekt.cycles.CycleDetector
+import io.github.mwmsh.minjekt.cycles.ServiceGraphSanityChecker
 
 class MinjeKtServiceLocator(val store: ServiceStore) {
     inline fun <reified TService> locate(): TService {
@@ -10,12 +10,12 @@ class MinjeKtServiceLocator(val store: ServiceStore) {
     }
 }
 
-class MinjeKtServiceLocatorBuilder(val store: ServiceStore) {
+class MinjeKtServiceLocatorBuilder(val store: ServiceStore, val serviceGraphSanityChecker: ServiceGraphSanityChecker) {
     companion object {
-        private val instance: MinjeKtServiceLocatorBuilder? = null
-        fun instance(): MinjeKtServiceLocatorBuilder {
+        fun create(): MinjeKtServiceLocatorBuilder {
             val store = ServiceStore().init()
-            return MinjeKtServiceLocatorBuilder(store)
+            val sanityChecker = ServiceGraphSanityChecker(store)
+            return MinjeKtServiceLocatorBuilder(store, sanityChecker)
         }
     }
 
@@ -45,7 +45,7 @@ class MinjeKtServiceLocatorBuilder(val store: ServiceStore) {
     }
 
     fun build(): MinjeKtServiceLocator {
-        CycleDetector.ensureSaneDependencyGraph(store)
+        serviceGraphSanityChecker.ensureSaneServiceGraphOrThrowErrors()
 
         store.getAllEagerLocators().forEach {
             it.initialize()

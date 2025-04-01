@@ -1,5 +1,7 @@
 package io.github.mwmsh.minjekt.store
 
+import io.github.mwmsh.minjekt.cycles.ServiceElement
+import io.github.mwmsh.minjekt.cycles.ServiceElementCreator
 import io.github.mwmsh.minjekt.locator.*
 import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
 import java.util.*
@@ -10,12 +12,13 @@ class ServiceStore() {
     private var locatorFactory: LocatorFactory? = null
     private var serviceLocatorRegistry: ClassLocatorTypeRegistry? = null
     private var registeredClasses: HashMap<KClass<*>, KClass<*>> = HashMap()
+    private var serviceElementCreator = ServiceElementCreator(this)
 
     fun init(): ServiceStore {
-        val parameterInitializer = ObjectConstructor(this)
+        val parameterInitializer = CrossLocatorObjectConstructor(this)
         val lazySingletonLocator = LazySingletonLocator(parameterInitializer)
         val transientLocator = TransientLocator(parameterInitializer)
-        val singletonLocator = SingletonLocator(parameterInitializer)
+        val singletonLocator = EagerSingletonLocator(parameterInitializer)
         this.locatorFactory =
             LocatorFactory(lazySingletonLocator, transientLocator, singletonLocator)
         this.serviceLocatorRegistry = ClassLocatorTypeRegistry()
@@ -82,8 +85,8 @@ class ServiceStore() {
         return registeredClasses[service]
     }
 
-    internal fun getAllServices(): List<KClass<*>> {
-        return registeredClasses.keys.toList()
+    internal fun getAllServices(): List<ServiceElement> {
+        return registeredClasses.keys.map{serviceElementCreator.createOrGet(it)}
     }
 
     internal fun getAllEagerLocators(): List<EagerLocator> {

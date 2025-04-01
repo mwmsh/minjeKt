@@ -2,8 +2,9 @@ package io.github.mwmsh.minjekt.locator
 
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.jvm.jvmName
 
-class LazySingletonLocator(val objectConstructor: ObjectConstructor) : Locator {
+class LazySingletonLocator(val objectConstructor: CrossLocatorObjectConstructor) : Locator {
     val singletonInstances: HashMap<KClass<*>, Any> = HashMap()
     val singletonClasses: HashMap<KClass<*>, KClass<*>> = HashMap()
 
@@ -15,9 +16,12 @@ class LazySingletonLocator(val objectConstructor: ObjectConstructor) : Locator {
         singletonInstances[service] = obj
     }
 
+    @Synchronized
     override fun locate(service: KClass<*>): Any {
-        if (!singletonInstances.containsKey(service)) {
-            init(service)
+        synchronized(service.jvmName) {
+            if (!singletonInstances.containsKey(service)) {
+                init(service)
+            }
         }
 
         return singletonInstances[service]!!

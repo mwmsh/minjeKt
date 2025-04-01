@@ -1,7 +1,7 @@
 package io.github.mwmsh.minjekt.locator
 
 
-class LocatorFactory(lazySingletonLocator: LazySingletonLocator, transientLocator: TransientLocator, singletonLocator: SingletonLocator){
+class LocatorFactory(lazySingletonLocator: LazySingletonLocator, transientLocator: TransientLocator, singletonLocator: EagerSingletonLocator){
     val locators: Map<LocatorType, Locator> = mapOf(
         LocatorType.TRANSIENT to transientLocator,
         LocatorType.LAZY_SINGLETON to lazySingletonLocator,

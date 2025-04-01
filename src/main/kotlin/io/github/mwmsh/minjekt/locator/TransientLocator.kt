@@ -4,7 +4,7 @@ import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
 import java.util.*
 import kotlin.reflect.KClass
 
-class TransientLocator(val objectConstructor: ObjectConstructor): Locator {
+class TransientLocator(val objectConstructor: CrossLocatorObjectConstructor): Locator {
     private val serviceClasses: HashMap<KClass<*>, KClass<*>> = HashMap()
 
     override fun register(service: KClass<*>, impl: KClass<*>) {
