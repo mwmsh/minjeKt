@@ -49,3 +49,6 @@ replay_pid*
 .kotlin/
 
 .idea/
+
+.DS_Store
+src/.DS_Store
