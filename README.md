@@ -1,4 +1,10 @@
 # MinjeKt
+
+![Kotlin Version](https://img.shields.io/badge/Kotlin-2.1.10-blue.svg)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mwmsh.minjekt/minjekt.svg)](https://search.maven.org/artifact/io.github.mwmsh.minjekt/minjekt)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Slack](https://img.shields.io/badge/Slack-join-blue.svg?logo=slack)](https://join.slack.com/t/minjekt/shared_invite/zt-32u0idnjq-wGz7UQNXTWMlDZsGd5X1gw)
+
 MinjeKt is a pure Kotlin, thread-safe dependency injection micro-framework with zero dependencies. It's designed to be minimal, readable and _very_ easy to learn and use (no annotations!).
 
 The steps and code below are all you need to let MinjeKt manage your dependencies. Get started in less than 5 minutes!
