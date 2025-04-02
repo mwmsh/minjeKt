@@ -1,6 +1,5 @@
-package org.minjekt.locator
+package io.github.mwmsh.minjekt.locator
 
-import io.github.mwmsh.minjekt.locator.LocatorType
 import io.github.mwmsh.minjekt.store.ServiceStore
 import io.github.mwmsh.minjekt.cycles.ServiceGraphSanityChecker
 

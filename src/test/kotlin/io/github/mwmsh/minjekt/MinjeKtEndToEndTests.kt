@@ -1,8 +1,8 @@
 package io.github.mwmsh.minjekt
 
 import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
-import org.minjekt.locator.MinjeKtServiceLocator
-import org.minjekt.locator.MinjeKtServiceLocatorBuilder
+import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocator
+import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocatorBuilder
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

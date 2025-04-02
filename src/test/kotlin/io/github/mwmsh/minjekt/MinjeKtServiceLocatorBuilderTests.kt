@@ -5,8 +5,8 @@ import io.github.mwmsh.minjekt.exception.ConstructorIsNotAccessibleException
 import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
 import io.github.mwmsh.minjekt.exception.PrimaryConstructorNotFoundException
 import org.junit.jupiter.api.assertThrows
-import org.minjekt.locator.MinjeKtServiceLocator
-import org.minjekt.locator.MinjeKtServiceLocatorBuilder
+import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocator
+import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocatorBuilder
 import kotlin.test.*
 
 
