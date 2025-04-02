@@ -30,7 +30,7 @@ You can register your dependencies like this example
 ```kotlin
 @Test
 fun localIntegTest(){
-    val minject = MinjektServiceLocatorBuilder.create()
+    val minject = MinjeKtBuilder.create()
         .registerSingleton<UserDao, UserDao>()
         .registerLazySingleton<Controller, LoginController>()
         .registerTransient<Database, MockDatabaseImpl>()
@@ -81,7 +81,7 @@ MinjeKt offers three main ways to register dependencies: singletons, lazy single
 
 **Singletons** are eagerly constructed when the build() method is invoked
 ```kotlin
- val minjekt = MinjeKtServiceLocatorBuilder.create()
+ val minjekt = MinjeKtBuilder.create()
 .registerSingleton<Interface, InterfaceImpl>()
 .registerSingleton<ClassImpl, ClassImpl>()
 .registerSingleton<Interface2>(Interface2Impl())
@@ -92,7 +92,7 @@ val instance = minjekt.locate<ClassImpl>()
 
 **Lazy Singletons** are constructed lazily whenever they are first requested
 ```kotlin
-val minjekt = MinjektServiceLocatorBuilder.create()
+val minjekt = MinjektBuilder.create()
 .registerLazySingleton<Interface, InterfaceImpl>()
 .registerLazySingleton<ClassImpl, ClassImpl>()
 .build() //Only validation of lazy singletons happens at this point
@@ -104,7 +104,7 @@ val instance = minjekt.locate<Interface>() //construction of lazy singletons
 
 **Transients** are constructed whenever they are requested
 ```kotlin
-val minjekt = MinjeKtServiceLocatorBuilder.create()
+val minjekt = MinjeKtrBuilder.create()
     .registerTransient<TransientClass, TransientClass>()
     .registerTransient<Interface, InterfaceImpl>()
     .build() //Only validation of transients happens here

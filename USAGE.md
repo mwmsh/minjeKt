@@ -3,7 +3,7 @@
 ```kotlin
 package io.github.mwmsh.minjekt.example
 
-import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocatorBuilder
+import io.github.mwmsh.minjekt.locator.MinjeKtBuilder
 import java.util.*
 
 interface Database {
@@ -58,7 +58,7 @@ class DummyClient(val controller: UsersController): IClient {
 }
 
 fun main() {
-    val minjekt = MinjeKtServiceLocatorBuilder.create()
+    val minjekt = MinjeKtBuilder.create()
         .registerLazySingleton<Database, LocalDB>()
         .registerTransient<UserDao, UserDao>()
         .registerTransient<UsersController, UsersController>()

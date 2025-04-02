@@ -5,8 +5,8 @@ import io.github.mwmsh.minjekt.exception.ConstructorIsNotAccessibleException
 import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
 import io.github.mwmsh.minjekt.exception.PrimaryConstructorNotFoundException
 import org.junit.jupiter.api.assertThrows
-import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocator
-import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocatorBuilder
+import io.github.mwmsh.minjekt.locator.MinjeKt
+import io.github.mwmsh.minjekt.locator.MinjeKtBuilder
 import kotlin.test.*
 
 
@@ -53,17 +53,17 @@ interface C{}
 
 class CImpl(a: A, b: B): C {}
 
-class MinjeKtServiceLocatorBuilderTests {
+class MinjeKtBuilderTests {
     @Test
     fun whenAnUnregisteredClassIsLocated_AnExceptionIsThrown() {
         assertThrows<DependencyNotRegisteredException> {
-            MinjeKtServiceLocatorBuilder.create().build().locate<DummyTestClass>()
+            MinjeKtBuilder.create().build().locate<DummyTestClass>()
         }
     }
 
     @Test
     fun whenARegisteredSingletonClassIsLocated_NoExceptionIsThrown() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerLazySingleton<DummyTestClass, DummyTestClass>()
 
         val dummyObj = locator.build().locate<DummyTestClass>()
@@ -73,7 +73,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenASingletonInterfaceIsLocated_AnImplementationIsReturned() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerLazySingleton<DummyInterface, DummyImpl>()
             .build()
 
@@ -84,7 +84,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenSingletonTwoClassCircularDepIsEncountered_AnExceptionIsThrown() {
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerLazySingleton<CircularDep1, CircularDep1>()
             .registerLazySingleton<CircularDep2, CircularDep2>()
 
@@ -96,7 +96,7 @@ class MinjeKtServiceLocatorBuilderTests {
     fun whenOneClassCircularDepIsEncountered_AnExceptionIsThrown() {
         class CircularDep(val x: CircularDep)
 
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerLazySingleton<CircularDep, CircularDep>()
 
         assertThrows<CircularDependencyException> { builder.build() }
@@ -104,7 +104,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenThreeClassCircularDependencyIsEncountered_AnExceptionIsThrown() {
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerLazySingleton<CircularDepA, CircularDepA>()
             .registerLazySingleton<CircularDepB, CircularDepB>()
             .registerLazySingleton<CircularDepC, CircularDepC>()
@@ -116,7 +116,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenASingletonDependencyIsLocatedMultipleTimes_ItIsAlwaysTheSameObject() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerLazySingleton<DummyInterface, DummyImpl>()
             .build()
 
@@ -132,7 +132,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenARegisteredTransientClassIsLocated_NoExceptionIsThrown() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerTransient<DummyTestClass, DummyTestClass>()
             .build()
 
@@ -143,7 +143,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenATransientInterfaceIsLocated_AnImplementationIsReturned() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerTransient<DummyInterface, DummyImpl>()
             .build()
 
@@ -154,7 +154,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenTransientTwoClassCircularDepIsEncountered_AnExceptionIsThrown() {
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerTransient<CircularDep1, CircularDep1>()
             .registerTransient<CircularDep2, CircularDep2>()
 
@@ -164,7 +164,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenTransientAndSingletonClassesCircularDepIsEncountered_AnExceptionIsThrown() {
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerTransient<CircularDep1, CircularDep1>()
             .registerLazySingleton<CircularDep2, CircularDep2>()
 
@@ -174,7 +174,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenATransientDependencyIsLocatedMultipleTimes_ItIsAlwaysADifferentObject() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerTransient<DummyInterface, DummyImpl>()
             .build()
 
@@ -190,7 +190,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenATransientClassReferencesASingletonClass_NoErrorsOccur() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerLazySingleton<SingletonDep, SingletonDep>()
             .registerTransient<TransientDep, TransientDep>()
             .build()
@@ -210,7 +210,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenASingletonClassReferencesATransientClass_NoErrorsOccur() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerTransient<TransientDep2, TransientDep2>()
             .registerLazySingleton<SingletonDep2, SingletonDep2>()
             .build()
@@ -235,7 +235,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenAnEagerSingletonServiceIsRegistered_ItIsLocatedSuccessfully() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerSingleton<DummyInterface, DummyImpl>()
             .build()
 
@@ -248,7 +248,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenADependencyCycleContainingEagerSingletonLazySingletonTransientOccurs_ItThrowsAnError() {
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerTransient<TransientDepX, TransientDepX>()
             .registerLazySingleton<LazySingletonDep, LazySingletonDep>()
             .registerSingleton<EagerSingletonDep, EagerSingletonDep>()
@@ -261,7 +261,7 @@ class MinjeKtServiceLocatorBuilderTests {
     @Test
     fun whenAnEagerSingletonInstanceIsRegistered_ItIsLocatedSuccessfully() {
         val impl = DummyImpl()
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerSingleton<DummyInterface>(impl)
             .build()
 
@@ -273,7 +273,7 @@ class MinjeKtServiceLocatorBuilderTests {
     @Test
     fun whenALazySingletonInstanceIsRegistered_ItIsLocatedSuccessfully() {
         val impl = DummyImpl()
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerLazySingleton<DummyInterface>(impl)
             .build()
 
@@ -284,7 +284,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenATypeWithNoPrimaryConstructorIsRegistered_AnExceptionIsThrown() {
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerSingleton<DummyInterface, DummyInterface>()
 
         assertThrows<PrimaryConstructorNotFoundException> {
@@ -294,7 +294,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenAClassWithAPrivateConstructorIsRegistered_AnExceptionIsThrown() {
-        val builder = MinjeKtServiceLocatorBuilder.create()
+        val builder = MinjeKtBuilder.create()
             .registerSingleton<ClassWithPrivateConstructor, ClassWithPrivateConstructor>()
 
         assertThrows<ConstructorIsNotAccessibleException> {
@@ -306,7 +306,7 @@ class MinjeKtServiceLocatorBuilderTests {
     fun whenAClassWithADefaultParameterIsRegistered_DefaultParametersAreRespected() {
         class DefClass(val param: List<String> = listOf("hello"))
 
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerSingleton<DefClass, DefClass>()
             .build()
 
@@ -326,7 +326,7 @@ class MinjeKtServiceLocatorBuilderTests {
             val class2: TestClass2
         )
 
-        val locator: MinjeKtServiceLocator = MinjeKtServiceLocatorBuilder.create()
+        val locator: MinjeKt = MinjeKtBuilder.create()
             .registerSingleton<TestClass1, TestClass1>()
             .registerSingleton<TestClass2, TestClass2>()
             .registerSingleton<DefClass, DefClass>()
@@ -339,7 +339,7 @@ class MinjeKtServiceLocatorBuilderTests {
 
     @Test
     fun whenABunchOfClassesHaveNoCycles_NoErrorsShouldOccur(){
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerSingleton<A, AImpl>()
             .registerSingleton<B, BImpl>()
             .registerSingleton<C, CImpl>()
@@ -359,7 +359,7 @@ class MinjeKtServiceLocatorBuilderTests {
             fun show() = item.toString()
         }
 
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerSingleton<Box<String>>(Box("Hello!"))
             .registerLazySingleton<Box<Int>>(Box(42))
             .registerSingleton<Box<Boolean>>(Box(true))

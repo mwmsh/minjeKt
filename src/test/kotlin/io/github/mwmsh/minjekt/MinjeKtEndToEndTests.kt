@@ -1,8 +1,8 @@
 package io.github.mwmsh.minjekt
 
 import io.github.mwmsh.minjekt.exception.DependencyNotRegisteredException
-import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocator
-import io.github.mwmsh.minjekt.locator.MinjeKtServiceLocatorBuilder
+import io.github.mwmsh.minjekt.locator.MinjeKt
+import io.github.mwmsh.minjekt.locator.MinjeKtBuilder
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -88,12 +88,12 @@ class ZetaImpl(
 }
 
 
-class MinjeKtServiceLocatorE2ELargeTest {
+class MinjeKtE2ELargeTest {
 
     @Test
     fun `test multiple interfaces in large end-to-end scenario`() {
         // 1) Build the locator with many registrations
-        val locator: MinjeKtServiceLocator = MinjeKtServiceLocatorBuilder.create()
+        val locator: MinjeKt = MinjeKtBuilder.create()
             // Singletons
             .registerSingleton<IAlpha, AlphaImpl>()
             .registerSingleton<IDelta, DeltaImpl>()
@@ -199,7 +199,7 @@ class MinjeKtServiceLocatorE2ELargeTest {
      * Demonstrates a simple concurrency test if your service locator is thread-safe.
      * (You can expand or remove this as needed.)
      */
-    private fun concurrencyTest(locator: MinjeKtServiceLocator) {
+    private fun concurrencyTest(locator: MinjeKt) {
         val numThreads = 8
         val iterationsPerThread = 50
         val latch = CountDownLatch(numThreads)
@@ -230,7 +230,7 @@ class MinjeKtServiceLocatorE2ELargeTest {
 
     @Test
     fun `expanded concurrency test`() {
-        val locator = MinjeKtServiceLocatorBuilder.create()
+        val locator = MinjeKtBuilder.create()
             .registerSingleton<IAlpha, AlphaImpl>()
             .registerLazySingleton<IBeta, BetaImpl>()
             .registerTransient<IGamma, GammaImpl>()
@@ -242,7 +242,7 @@ class MinjeKtServiceLocatorE2ELargeTest {
     }
 
 
-    private fun concurrencyTestSingleton(locator: MinjeKtServiceLocator) {
+    private fun concurrencyTestSingleton(locator: MinjeKt) {
         val concurrencyLevel = 20
         val iterationsPerThread = 30
         val executor = Executors.newFixedThreadPool(concurrencyLevel)
@@ -278,7 +278,7 @@ class MinjeKtServiceLocatorE2ELargeTest {
         assertEquals(1, distinctInstances.size, "All references should be identical for a singleton.")
     }
 
-    private fun concurrencyTestLazySingleton(locator: MinjeKtServiceLocator) {
+    private fun concurrencyTestLazySingleton(locator: MinjeKt) {
         val concurrencyLevel = 20
         val iterationsPerThread = 30
         val executor = Executors.newFixedThreadPool(concurrencyLevel)
@@ -309,7 +309,7 @@ class MinjeKtServiceLocatorE2ELargeTest {
         assertEquals(1, distinctInstances.size, "All references should be identical for a lazy singleton.")
     }
 
-    private fun concurrencyTestTransient(locator: MinjeKtServiceLocator) {
+    private fun concurrencyTestTransient(locator: MinjeKt) {
         val concurrencyLevel = 20
         val iterationsPerThread = 30
         val executor = Executors.newFixedThreadPool(concurrencyLevel)
