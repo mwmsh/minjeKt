@@ -9,7 +9,7 @@ plugins {
 
 val groupName = "io.github.mwmsh.minjekt"
 val packageName = "minjekt"
-val packageVersion = "0.1"
+val packageVersion = "0.1.1"
 
 val fullPackageName = "$groupName:$packageName$version"
 val fullPackagePath = "${groupName.replace(".", "/")}/$packageName/$packageVersion/"
@@ -178,11 +178,11 @@ tasks.register("generateChecksums") {
 
     val algorithms = listOf("MD5", "SHA-1")
 
-    inputs.files(fileTree("build/libs").matching { include("*.jar", "*.pom") })
-    outputs.dir("${layout.buildDirectory}/libs")
+    inputs.files(fileTree(layout.buildDirectory.dir("libs").get().asFile.path).matching { include("*.jar", "*.pom") })
+    outputs.dir(layout.buildDirectory.dir("libs"))
 
     doLast {
-        val outputDir = file("${layout.buildDirectory}/libs")
+        val outputDir = file("${buildDir}/libs")
         outputDir.mkdirs()
         val files = file("build/libs").listFiles()?.filter{it.name.endsWith(".jar") || it.name.endsWith(".pom")}?.filter{!it.name.contains("bundle")}
         files?.forEach { file ->
@@ -192,7 +192,7 @@ tasks.register("generateChecksums") {
                     val bytes = digest.digest(input.readBytes())
                     bytes.joinToString("") { "%02x".format(it) }
                 }
-                val checksumFile = file("$outputDir/${file.name}.${algorithm.lowercase().replace("-", "")}")
+                val checksumFile = file("${outputDir.path}/${file.name}.${algorithm.lowercase().replace("-", "")}")
                 checksumFile.writeText(checksum)
                 println("Generated $algorithm checksum for ${file.name}: $checksum")
             }
@@ -231,7 +231,7 @@ tasks.register<Exec>("uploadToSonatype") {
     val password = project.properties["ossrhPassword"] as String?
     val authToken = Base64.getEncoder().encodeToString("$username:$password".encodeToByteArray())
 
-    val bundlePath = "${layout.buildDirectory}/distributions/artifacts.zip"
+    val bundlePath = layout.buildDirectory.dir("distributions/artifacts.zip").get().asFile.path
 
     commandLine = listOf(
         "curl",
